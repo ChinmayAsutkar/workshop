@@ -1,0 +1,60 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Booking {
+  bookingDate   DateTime?
+  createdAt     DateTime  @default(now())
+  flight        Flight?   @relation(fields: [flightId], references: [id])
+  flightId      String?   @db.ObjectId
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  paymentStatus String?
+  totalPrice    Float?
+  updatedAt     DateTime  @updatedAt
+  user          User?     @relation(fields: [userId], references: [id])
+  userId        String?   @db.ObjectId
+}
+
+model Flight {
+  airlineName    String?
+  arrivalTime    DateTime?
+  bookings       Booking[]
+  createdAt      DateTime  @default(now())
+  departureTime  DateTime?
+  flightNumber   String?
+  fromAirport    String?
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  price          Float?
+  seatsAvailable Int?
+  toAirport      String?
+  updatedAt      DateTime  @updatedAt
+}
+
+model Otp {
+  createdAt      DateTime  @default(now())
+  expirationDate DateTime?
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  otpCode        String?
+  updatedAt      DateTime  @updatedAt
+  user           User?     @relation(fields: [userId], references: [id])
+  userId         String?   @db.ObjectId
+}
+
+model User {
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  email     String?   @unique
+  firstName String?
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  lastName  String?
+  otps      Otp[]
+  password  String
+  roles     Json
+  updatedAt DateTime  @updatedAt
+  username  String    @unique
+}
